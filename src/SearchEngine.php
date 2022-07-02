@@ -33,34 +33,62 @@ class SearchEngine
         
         $prev_url = "";
         $i=0;
-        foreach($domResult->find('a[href^=/url?]') as $link){
-
-            // List first n number($num_result) of resuts only (For clean up te crawled data)
-            if($i==$num_result)
-                break;
-
-            // Clean url to return on array
-            $url = explode('=',explode('&',$link->href)[0])[1];
-
-            // Prevent same result quick links as record
-            if($prev_url!=""){
-                if(strpos($link->href, $prev_url) !== false)
-                    continue;
-            }
-
-            $meta_data = $this->get_meta_info($url);
+        
+        // Promoted results
+        foreach($domResult->find(' a div[role=heading]') as $link){
+            
+            // Fetch promoted url
+            $promoted_url = substr(str_replace('<span dir="ltr">www.','https://',$link->next_sibling()->children[1]->innertext),0,-7);
+            $meta_data = $this->get_meta_info($promoted_url);
 
             // Construct final array
             $search_data[] = array(
                 'keyword' => isset($meta_data['keywords'])? $meta_data['keywords']:"",
                 'ranking' => $i,
-                'url' => $url,
-                'title' => $link->plaintext,
+                'url' => $promoted_url,
+                'title' => $link->innertext,
                 'description' => isset($meta_data['description'])?$meta_data['description']:"",
-                'promoted' => 1,
+                'promoted' => true,
             );
-            $prev_url=$url;
+
             $i++;
+
+            if($i==$num_result)
+                break;
+            
+        }
+
+        // Organiz result
+        if($i<$num_result){
+            foreach($domResult->find('a[href^=/url?]') as $link){
+
+                // List first n number($num_result) of resuts only (For clean up te crawled data)
+                if($i==$num_result)
+                    break;
+
+                // Clean url to return on array
+                $url = explode('=',explode('&',$link->href)[0])[1];
+
+                // Prevent same result quick links as record
+                if($prev_url!=""){
+                    if(strpos($link->href, $prev_url) !== false)
+                        continue;
+                }
+
+                $meta_data = $this->get_meta_info($url);
+
+                // Construct final array
+                $search_data[] = array(
+                    'keyword' => isset($meta_data['keywords'])? $meta_data['keywords']:"",
+                    'ranking' => $i,
+                    'url' => $url,
+                    'title' => $link->plaintext,
+                    'description' => isset($meta_data['description'])?$meta_data['description']:"",
+                    'promoted' => false,
+                );
+                $prev_url=$url;
+                $i++;
+            }
         }
 
         $return_data = array(

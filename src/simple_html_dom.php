@@ -1,4 +1,6 @@
 <?php
+
+namespace FlScrapper\GoogleScraperPackage; 
 /**
  * Website: http://sourceforge.net/projects/simplehtmldom/
  * Additional projects: http://sourceforge.net/projects/debugobject/

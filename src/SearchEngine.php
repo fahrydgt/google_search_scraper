@@ -1,8 +1,7 @@
 <?php
 
-namespace FlScrapper\GoogleScraperPackage;
+namespace FlScrapper\GoogleScraperPackage; 
 
-include('simple_html_dom.php');
 
 class SearchEngine
 {
@@ -14,7 +13,7 @@ class SearchEngine
         echo "Search sngine set to: ".$this->search_engine;
     }
 
-    public function search($keywords=[])
+    public function search($keywords=[], $num_result=5)
     {
         $query = "";
         if(!empty($keywords)){
@@ -24,7 +23,7 @@ class SearchEngine
             return false;
         }
         
-        $search_url = "https://".$this->search_engine."/search?num=50&h1=en".$query;
+        $search_url = "https://".$this->search_engine."/search?num=".$num_result."&h1=en".$query;
         echo "<br>query string is".$search_url;
                 
         $result = $this->file_get_contents_curl($search_url);
@@ -38,8 +37,8 @@ class SearchEngine
         $i=0;
         foreach($domResult->find('a[href^=/url?]') as $link){
 
-            // List first 50 resuts only (For clean up te crawled data)
-            if($i==50)
+            // List first n number($num_result) of resuts only (For clean up te crawled data)
+            if($i==$num_result)
                 break;
 
             // Clean url to return on array
@@ -51,7 +50,7 @@ class SearchEngine
                     continue;
             }
 
-            $meta_data = get_meta_info($url);
+            $meta_data = $this->get_meta_info($url);
 
             // Construct final array
             $search_data[] = array(
@@ -64,7 +63,6 @@ class SearchEngine
             );
             $prev_url=$url;
             $i++;
-            break;
         }
 
         return $search_data;
@@ -92,7 +90,7 @@ class SearchEngine
         $html = $this->file_get_contents_curl($url);
         
         // Parses the HTML contained in the string source
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         @$doc->loadHTML($html); 
         $metas = $doc->getElementsByTagName('meta');
         

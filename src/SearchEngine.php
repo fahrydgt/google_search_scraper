@@ -10,7 +10,6 @@ class SearchEngine
     public function setEngine($engine="google.com")
     {
         $this->search_engine = $engine;
-        echo "Search sngine set to: ".$this->search_engine;
     }
 
     public function search($keywords=[], $num_result=5)
@@ -24,7 +23,6 @@ class SearchEngine
         }
         
         $search_url = "https://".$this->search_engine."/search?num=".$num_result."&h1=en".$query;
-        echo "<br>query string is".$search_url;
                 
         $result = $this->file_get_contents_curl($search_url);
 
@@ -65,7 +63,14 @@ class SearchEngine
             $i++;
         }
 
-        return $search_data;
+        $return_data = array(
+            'search_engine' => $this->search_engine,
+            'search_url' => $search_url,
+            'requested_result_count' => $num_result,
+            'data' => $search_data,
+        );
+
+        return $return_data;
     }
 
     // Use PHP native curl funtion for http req/res

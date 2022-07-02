@@ -1,0 +1,18 @@
+{
+    "name": "fahrydgt/google_search_scraper",
+    "description": "Package for scrape the google result with search parameters.",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Fahry Lafir",
+            "email": "fahrydgt@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "FlScrapper\\GoogleScraperPackage\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}
